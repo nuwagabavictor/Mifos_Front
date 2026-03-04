@@ -1,0 +1,67 @@
+/**
+ * Copyright since 2025 Mifos Initiative
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+import { DatePipe } from '@angular/common';
+import { Injectable, inject } from '@angular/core';
+import moment from 'moment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class Dates {
+  private datePipe = inject(DatePipe);
+
+  public static DEFAULT_DATEFORMAT = 'yyyy-MM-dd';
+  public static DEFAULT_DATETIMEFORMAT = 'yyyy-MM-dd HH:mm';
+
+  public getDate(timestamp: any): string {
+    return this.datePipe.transform(timestamp, 'yyyy-MM-dd');
+  }
+
+  public formatDate(timestamp: any, dateFormat: string): string {
+    const datePipe: DatePipe = new DatePipe(this.language.code);
+    return datePipe.transform(timestamp, dateFormat);
+  }
+
+  public formatDateAsString(value: Date, dateFormat: string): string {
+    const momentFormat = dateFormat.replace(/y/g, 'Y').replace(/d/g, 'D').replace(/a/g, 'A');
+    return moment(value).format(momentFormat);
+  }
+
+  public parseDate(value: any): Date {
+    if (value instanceof Array) {
+      return moment(value.join('-'), 'YYYY-MM-DD').toDate();
+    } else {
+      return moment(value).toDate();
+    }
+  }
+
+  public parseDatetime(value: any): Date {
+    return moment(value).toDate();
+  }
+
+  public convertToDate(value: any, format: string): Date {
+    const momentFormat = format.replace(/y/g, 'Y').replace(/d/g, 'D').replace(/a/g, 'A');
+    return moment(value, momentFormat).toDate();
+  }
+
+  get language() {
+    if (!localStorage.getItem('mifosXLanguage')) {
+      return 'en';
+    }
+    return JSON.parse(localStorage.getItem('mifosXLanguage'));
+  }
+
+  calculateDiff(date1: Date, date2: Date) {
+    return Math.floor(
+      (Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate()) -
+        Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate())) /
+        (1000 * 60 * 60 * 24)
+    );
+  }
+}
