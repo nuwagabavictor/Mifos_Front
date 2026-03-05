@@ -35,7 +35,8 @@ RUN npm config set fetch-retry-maxtimeout 120000 \
 COPY . .
 
 # Run version.js and ngcc manually (these were in postinstall script)
-RUN node version.js && npx ngcc
+RUN node version.js 
+# && npx ngcc
 
 # Build the application
 RUN npm run build -- --output-path=/dist $BUILD_ENVIRONMENT_OPTIONS
